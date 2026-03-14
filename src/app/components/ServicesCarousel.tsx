@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type ServiceCard = {
   title: string;
@@ -8,86 +8,101 @@ export type ServiceCard = {
 };
 
 export default function SCarousel({ cards }: { cards: ServiceCard[] }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [scrollHeight, setScrollHeight] = useState(0);
 
-  const scrollByOne = (dir: "left" | "right") => {
-    const el = scrollerRef.current;
-    if (!el) return;
+  useEffect(() => {
+    const container = containerRef.current;
+    const scroller = scrollerRef.current;
+    if (!container || !scroller) return;
 
-    // scroll by one card width (approx)
-    const firstCard = el.querySelector<HTMLElement>("[data-card]");
-    const amount = firstCard ? firstCard.offsetWidth + 24 : Math.floor(el.clientWidth * 0.9);
+    const calculateHeights = () => {
+      const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+      setScrollHeight(maxScroll);
+      return maxScroll;
+    };
 
-    el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
-  };
+    // Initial calculation
+    calculateHeights();
+
+    const handleScroll = () => {
+      const rect = container.getBoundingClientRect();
+      const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+      
+      // When container reaches top of viewport, start horizontal scroll
+      // Keep pinned until we've scrolled through all cards
+      if (rect.top <= 0 && rect.top >= -maxScroll) {
+        // Pin by setting container to full viewport and translate scroll
+        const horizontalScroll = Math.min(maxScroll, Math.abs(rect.top));
+        scroller.scrollLeft = horizontalScroll;
+      } else if (rect.top < -maxScroll) {
+        // Scrolled past all cards, keep at end
+        scroller.scrollLeft = maxScroll;
+      } else if (rect.top > 0) {
+        // Above viewport, reset to start
+        scroller.scrollLeft = 0;
+      }
+    };
+
+    const handleResize = () => {
+      calculateHeights();
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
-    <div className="relative">
-      {/* arrows (like the picture) */}
-      <button
-        type="button"
-        onClick={() => scrollByOne("left")}
-        aria-label="Scroll left"
-        className="absolute -left-10 top-1/2 -translate-y-1/2 z-10 hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full bg-black border border-slate-200 shadow-sm hover:bg-white"
+    <div
+      ref={containerRef}
+      className="relative"
+      style={{ 
+        height: `calc(100vh + ${scrollHeight}px)`,
+        minHeight: "100vh"
+      }}
+    >
+      <div 
+        className="sticky top-0 h-full flex items-center overflow-hidden"
       >
-        ‹
-      </button>
+        <div
+          ref={scrollerRef}
+          className="flex gap-4 overflow-x-hidden py-2 px-6 md:px-0"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {cards.map((card) => (
+            <div
+              key={card.title}
+              className="shrink-0 w-[85%] sm:w-[45%] md:w-[30%] flex flex-col items-center"
+            >
+              <div className="w-full max-w-sm">
+                <div className="rounded-xl h-56 w-full bg-purple-900 mx-auto" />
 
-      <button
-        type="button"
-        onClick={() => scrollByOne("right")}
-        aria-label="Scroll right"
-        className="absolute -right-10 top-1/2 -translate-y-1/2 z-10 hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full bg-black border border-slate-200 shadow-sm hover:bg-white"
-      >
-        ›
-      </button>
-
-      {/* track */}
-      <div
-        ref={scrollerRef}
-        className="
-          flex gap-8
-          overflow-x-auto overflow-y-visible
-          snap-x snap-mandatory scroll-smooth no-scrollbar
-          py-4
-          px-6
-          scroll-px-6
-          md:px-0 md:scroll-px-0
-          bg-red-500
-          Z
-        "
-      >
-        {cards.map((card) => (
-          <div
-            key={card.title}
-            data-card
-            className="
-             snap-start shrink-0
-              w-[95%] sm:w-[100%] md:w-[320px]
-              flex flex-col items-center
-            "
-          >
-            {/* card */}
-            <div className="">
-              {/* purple square */}
-              <div className="rounded-xl h-40 w-[100%] bg-purple-900 mx-auto" />
-
-              {/* text centered */} 
-              <div className="pt-3 text-center">
-                <h3 className="text-[12px] font-semibold text-slate-700">
-                  {card.title}
-                </h3>
-                <p className="mt-2 mx-auto rounded-10 text-[10px] leading-4 text-slate-500">
-                  {card.description}
-                </p>
+                <div className="pt-3 text-center">
+                  <h3 className="text-[12px] font-semibold text-slate-700">
+                    {card.title}
+                  </h3>
+                  <p className="mt-2 mx-auto text-[10px] leading-4 text-slate-500">
+                    {card.description}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-
-        {/* tiny end pad */}
-        <div className="shrink-0 w-2" />
+          ))}
+        </div>
       </div>
+
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }

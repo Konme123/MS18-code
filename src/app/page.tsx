@@ -18,7 +18,7 @@ export default function Home() {
         />
       </div> */}
 
-      <section className="relative overflow-visible w-[100%]" id="home">
+      <section className="relative overflow-visible w-full" id="home">
         {/* <div className="pointer-events-none absolute inset-0 z-0 -translate-y-15 -translate-x-15">
           <Image
             src="/background.svg"
@@ -30,11 +30,11 @@ export default function Home() {
           />
         </div> */}
         
-        <div className="relative z-10 flex -mt-20 pt-10 mx-auto grid max-w-6xl grid-cols-1 items-center justify-center gap-10 px-6 md:grid-cols-[1fr_1.25fr]  h-170">
+        <div className="relative z-10 -mt-20 pt-10 mx-auto grid max-w-6xl grid-cols-1 items-center justify-center gap-10 px-6 md:grid-cols-[1fr_1.25fr]  h-170">
           <div className="pt-5">
             
             <h1 className="-mt-25 w-[200%] text-[clamp(4.2rem,5.6vw,3.75rem)] font-bold leading-[0.92] tracking-tighter text-slate-900  ">
-              <span className="block  text-[#404040] pt-2 bg-gradient-to-r from-[#984CD3] via-[#522BC9] to-[#411563] to-[90%]  text-transparent bg-clip-text ">
+              <span className="block  pt-2 bg-linear-to-r from-[#984CD3] via-[#522BC9] to-[#411563] to-90%  text-transparent bg-clip-text ">
                 <span className="font-miama font-thin inline-block align-baseline text-[2.9em] leading-[0.55]">W</span>
                 <span className="-ml-1">e</span>
                 <span className="ml-2">Focus on</span>
@@ -49,7 +49,7 @@ export default function Home() {
             </h1>
 
             <div className="mt-8 flex flex-col items-start gap-3">
-              <p className="mt-9 font-semibold max-w-xl text-lg leading-8 text-[#404040] bg-gradient-to-r from-[#984CD3] via-[#522BC9] to-[#411563] to-[90%] inline-block text-transparent bg-clip-text">
+              <p className="mt-9 font-semibold max-w-xl text-lg leading-8 bg-linear-to-r from-[#984CD3] via-[#522BC9] to-[#411563] to-90% inline-block text-transparent bg-clip-text">
             MS18 Computer Supplies & Services</p>
               
               <Link
@@ -108,7 +108,7 @@ export default function Home() {
       
       <section id="contact" className="border-t border-slate-100 bg-slate-50/50 scroll-mt-24">
         <div className="mx-auto max-w-6xl px-6 py-14">
-          <div className="rounded-3xl border border-slate-100 bg-gradient-to-br from-purple-50 via-white to-blue-50 px-8 py-12">
+          <div className="rounded-3xl border border-slate-100 bg-linear-to-br from-purple-50 via-white to-blue-50 px-8 py-12">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">Contact</h2>
             <p className="mt-3 max-w-2xl text-slate-600">
               Tell us what you need help with. We’ll reply with availability and a quick estimate.
