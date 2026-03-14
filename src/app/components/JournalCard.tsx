@@ -18,7 +18,7 @@ export default function JournalCard({ className }: JournalCardProps) {
             type="button"
             className="absolute bottom-8 right-8 rounded-full border border-transparent bg-white px-6 py-1 text-[12px] font-semibold text-[#1D4ED8] shadow-xl [background:linear-gradient(#fff,#fff)_padding-box,linear-gradient(to_bottom_right,#9A42E6,#562580)_border-box]"
           >
-            <p className="-mt-1 bg-gradient-to-br from-[#9A42E6] to-[#562580] bg-clip-text text-transparent">
+            <p className="-mt-1 bg-linear-to-br from-[#9A42E6] to-[#562580] bg-clip-text text-transparent">
               Find out more
             </p>
           </button>
@@ -29,9 +29,9 @@ export default function JournalCard({ className }: JournalCardProps) {
             </div>
 
             <div className="min-w-0 mt-4 -ml-4">
-              <div className="text-[14px] translate-y-1 -tracking-[1px] font-bold bg-gradient-to-br from-[#9A42E6]  to-[#562580]  from-20% to-90% bg-clip-text text-transparent">For the People</div>
+              <div className="text-[14px] translate-y-1 -tracking-[1px] font-bold bg-linear-to-br from-[#9A42E6]  to-[#562580]  from-20% to-90% bg-clip-text text-transparent">For the People</div>
               <div className="mt-1 text-[28px] font-bold leading-[1.05] -tracking-[1px]">
-                <span className="bg-gradient-to-b from-[#9A42E6]  to-[#562580] from-20% to-100% bg-clip-text text-transparent text-[3rem] -tracking-[3px]">Since 2003</span>
+                <span className="bg-linear-to-b from-[#9A42E6]  to-[#562580] from-20% to-100% bg-clip-text text-transparent text-[3rem] -tracking-[3px]">Since 2003</span>
               </div>
               <div className="mt-1 text-[1.2em] font-bold text-[#616161] -tracking-[1px]">The Perseverance of Technician</div>
 

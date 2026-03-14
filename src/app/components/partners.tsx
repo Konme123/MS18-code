@@ -7,12 +7,12 @@ export default function IPartners() {
   
     <section className="marquee-speed-partners w-full mx-auto -mt-13 py-5  scale-60">
       <div className="mx-auto max-w-8xl px-6">
-        <h1 className="mx-auto w-max grayscale whitespace-nowrap text-center text-[30px] -tracking-[2px] font-semibold bg-gradient-to-br from-[#4873FF] via-[#1629A6] to-[#142699] from-5% via-50% to-100% bg-clip-text text-transparent cursor-default hover:grayscale-0 transition-all duration-300 ">
+        <h1 className="mx-auto w-max grayscale whitespace-nowrap text-center text-[30px] -tracking-[2px] font-semibold bg-linear-to-br from-[#4873FF] via-[#1629A6] to-[#142699] from-5% via-50% to-100% bg-clip-text text-transparent cursor-default hover:grayscale-0 transition-all duration-300 ">
           MS18 Computer Supplies & Services Partners are:
         </h1>
       </div>
 
-      <div className="marquee-pausable blur-[2px] [transform:scaleX(-1)] marquee-fade mt-15 relative left-1/2 w-[119vw] -translate-x-1/2 overflow-hidden opacity-70">
+      <div className="marquee-pausable blur-[2px] transform-[scaleX(-1)] marquee-fade mt-15 relative left-1/2 w-[119vw] -translate-x-1/2 overflow-hidden opacity-70">
         <div className="marquee-track-reverse">
           <div className="marquee-group gap-12 px-6">
             {[...Array(8)].map((_, i) => {

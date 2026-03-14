@@ -11,7 +11,7 @@ export default function License() {
 
                 <h1 className="text-center text-[1.8em]  -tracking-[1px] font-bold">
                  
-                 <span className="relative z-20 bg-gradient-to-r from-[#984CD3] via-[#522BC9] grayscale opacity-70 to-[#411563] to-[90%] text-transparent bg-clip-text hover:grayscale-0 transition-all duration-300 cursor-default hover:opacity-100">
+                 <span className="relative z-20 bg-linear-to-r from-[#984CD3] via-[#522BC9] grayscale opacity-70 to-[#411563] to-90%ext-transparent bg-clip-text hover:grayscale-0 transition-all duration-300 cursor-default hover:opacity-100">
                   Licenses & Permits.
                   </span>
                  

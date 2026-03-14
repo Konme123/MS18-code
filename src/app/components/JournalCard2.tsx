@@ -15,7 +15,7 @@ export default function JournalCard2({ className }: JournalCardProps) {
             type="button"
             className="absolute bottom-8 right-8 flex   items-center justify-center rounded-full border border-transparent px-6 py-1 text-[12px] font-semibold bg-black shadow-xl [background:linear-gradient(#fff,#fff)_padding-box,linear-gradient(to_bottom_right,#2767BC,#142699)_border-box] "
           >
-            <p className="bg-gradient-to-br from-[#2767BC]  to-[#142699]  bg-clip-text text-transparent hover:text-white">
+            <p className="bg-linear-to-br from-[#2767BC]  to-[#142699]  bg-clip-text text-transparent hover:text-white">
               Find out more
             </p>
           </button>
@@ -26,9 +26,9 @@ export default function JournalCard2({ className }: JournalCardProps) {
             </div>
 
             <div className="min-w-0 pt-2">
-              <div className="text-[14px] -tracking-[1px] font-bold bg-gradient-to-b from-[#2767BC]  to-[#142699] from-20% to-100% bg-clip-text text-transparent ">For Companies</div>
-              <div className="mt-1 text-[20px] font-bold leading-[1] -tracking-[1px]">
-                <span className="bg-gradient-to-b from-[#2767BC]  to-[#142699]  bg-clip-text text-transparent from-40% to-100% w-full text-[2.1em] -tracking-[2px]">Willing to prepare you for the Digital Space.</span>
+              <div className="text-[14px] -tracking-[1px] font-bold bg-linear-to-b from-[#2767BC]  to-[#142699] from-20% to-100% bg-clip-text text-transparent ">For Companies</div>
+              <div className="mt-1 text-[20px] font-bold leading-none -tracking-[1px]">
+                <span className="bg-linear-to-b from-[#2767BC]  to-[#142699]  bg-clip-text text-transparent from-40% to-100% w-full text-[2.1em] -tracking-[2px]">Willing to prepare you for the Digital Space.</span>
               </div>
               <div className="mt-1 text-[1.2em] font-bold text-[#616161] -tracking-[1px]">The Perseverance of Technician</div>
 

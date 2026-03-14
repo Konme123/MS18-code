@@ -10,8 +10,8 @@ export default function About() {
     //about us
     <section id="about" className=" border-t border-slate-100 bg-white scroll-mt-20">
         <div className="mx-auto max-w-6xl px-6 ">
-          <div className="grid  grid-cols-[1fr_10fr] gap-1 rounded-3xl bg-gradient-to-br from-purple-50 via-white to-blue-50 px-1 py-1">
-            <div className="font-bold translate-x-[-20px] h-[21em] w-full bg-gradient-to-r from-[#4873FF] via-[#1629A6] to-[#142699] via-30%  to-100% bg-clip-text text-transparent">
+          <div className="grid  grid-cols-[1fr_10fr] gap-1 rounded-3xl bg-linear-to-br from-purple-50 via-white to-blue-50 px-1 py-1">
+            <div className="font-bold translate-x-[-20px] h-[21em] w-full bg-linear-to-r from-[#4873FF] via-[#1629A6] to-[#616475] via-30%  to-100% bg-clip-text text-transparent">
               <h2 className="text-[10em]  -tracking-[10px] ">About</h2>            
               <h2 className="text-[10em]  -tracking-[10px] leading-[0.2] ml-70">Us.</h2>
                 {/* Image left */}
