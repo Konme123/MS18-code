@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { createClient } from '@supabase/supabase-js';
 
@@ -28,7 +28,7 @@ function getJwtExpMs(jwt?: string) {
   }
 }
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
   providers: [
     CredentialsProvider({
@@ -62,7 +62,7 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: any; user?: any }) {
       if (user) {
         token.email = (user as any).email;
         token.sub = (user as any).id;
@@ -87,7 +87,7 @@ const handler = NextAuth({
 
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       if (session.user) {
         session.user.email = token.email as string;
       }
@@ -98,6 +98,8 @@ const handler = NextAuth({
   pages: {
     signIn: '/admin/login',
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

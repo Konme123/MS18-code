@@ -1,63 +1,29 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { createSupabaseAnonClient } from "@/lib/supabase";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SCarousel, { type ServiceCard } from "./ServicesCarousel"; // same folder
 import DirectionalMarquee from "./DirectionalMarquee";
+import servicesData from "@/data/services.json";
 
 export default function Services() {
-  const [serviceCards, setServiceCards] = useState<ServiceCard[]>([]);
   const marqueeWrapRef = useRef<HTMLDivElement | null>(null);
   const [marqueeVisible, setMarqueeVisible] = useState(false);
 
-  const fallbackCards: ServiceCard[] = [
-    {
-      title: "Computer Repair",
-      description: "Diagnostics and repair for desktops and laptops.",
-      details: "Diagnostics and repair for desktops and laptops.",
-      pillStatuses: ["available", "on_site"],
-    },
-    {
-      title: "IT Support",
-      description: "On-site and remote support for common IT issues.",
-      details: "On-site and remote support for common IT issues.",
-      pillStatuses: ["available", "remote"],
-    },
-    {
-      title: "Network Setup",
-      description: "Router, Wi‑Fi, and small office network setup.",
-      details: "Router, Wi‑Fi, and small office network setup.",
-      pillStatuses: ["available", "on_site"],
-    },
-  ];
-
-  useEffect(() => {
-    const run = async () => {
-      const supabase = createSupabaseAnonClient();
-      const { data, error } = await supabase
-        .from("services")
-        .select("id, title, description, details, icon_src, modal_image_src, pill_statuses, sort_order")
-        .order("sort_order", { ascending: true });
-
-      if (error || !data) {
-        setServiceCards(fallbackCards);
-        return;
-      }
-
-      const mapped: ServiceCard[] = (data as any[]).map((r) => ({
+  const serviceCards = useMemo(() => {
+    const sorted = [...(servicesData as any[])].sort(
+      (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)
+    );
+    return sorted.map(
+      (r): ServiceCard => ({
         title: r.title,
         description: r.description,
         details: r.details ?? undefined,
-        iconSrc: r.icon_src ?? undefined,
-        modalImageSrc: r.modal_image_src ?? undefined,
-        pillStatuses: (r.pill_statuses ?? []) as any,
-      }));
-
-      setServiceCards(mapped.length ? mapped : fallbackCards);
-    };
-
-    run();
+        iconSrc: r.iconSrc ?? undefined,
+        modalImageSrc: r.modalImageSrc ?? undefined,
+        pillStatuses: (r.pillStatuses ?? []) as any,
+      })
+    );
   }, []);
 
   useEffect(() => {

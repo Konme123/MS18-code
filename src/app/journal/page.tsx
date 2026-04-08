@@ -102,7 +102,7 @@ const SEEDED_POSTS: JournalPost[] = [
   },
 ];
 
-export default function JournalPage() {
+export default function JournalPage() { 
   const router = useRouter();
   const searchParams = useSearchParams();
   const [now, setNow] = useState<Date | null>(null);

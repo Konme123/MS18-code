@@ -22,6 +22,24 @@ type ServiceRow = {
   sort_order?: number | null;
 };
 
+function togglePillInSet(current: ServicePillStatus[] | null | undefined, pill: ServicePillStatus) {
+  const next = new Set<ServicePillStatus>((current ?? []) as ServicePillStatus[]);
+  if (next.has(pill)) next.delete(pill);
+  else next.add(pill);
+  return Array.from(next);
+}
+
+type StaticServiceRow = {
+  id: string;
+  title: string;
+  description: string;
+  details?: string | null;
+  iconSrc?: string | null;
+  modalImageSrc?: string | null;
+  pillStatuses?: ServicePillStatus[] | null;
+  sortOrder?: number | null;
+};
+
 type JournalPost = {
   id: string;
   category: string;
@@ -69,7 +87,7 @@ export default function AdminPage() {
   const [services, setServices] = useState<ServiceRow[]>([]);
   const [servicesError, setServicesError] = useState<string>('');
   const [savingServices, setSavingServices] = useState(false);
-  const [deletedServiceIds, setDeletedServiceIds] = useState<Set<string>>(new Set());
+  const [servicesSha, setServicesSha] = useState<string>('');
   const [newService, setNewService] = useState<Partial<ServiceRow>>({
     title: '',
     description: '',
@@ -126,18 +144,36 @@ export default function AdminPage() {
 
   const fetchServices = async () => {
     setServicesError('');
-    const supabase = createSupabaseAnonClient();
-    const { data, error: fetchError } = await supabase
-      .from('services')
-      .select('id, title, description, details, icon_src, modal_image_src, pill_statuses, sort_order')
-      .order('sort_order', { ascending: true });
+    try {
+      const res = await fetch('/api/admin/services', { cache: 'no-store' });
+      const json = (await res.json()) as { services?: StaticServiceRow[]; sha?: string; error?: string };
 
-    if (fetchError || !data) {
+      if (!res.ok || json.error) {
+        setServicesError(json.error || 'Failed to load services.');
+        setServices([]);
+        setServicesSha('');
+        return;
+      }
+
+      const rows = (json.services ?? []).slice().sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+      setServicesSha(json.sha ?? '');
+      setServices(
+        rows.map((r, idx) => ({
+          id: r.id,
+          title: r.title,
+          description: r.description,
+          details: r.details ?? null,
+          icon_src: r.iconSrc ?? null,
+          modal_image_src: r.modalImageSrc ?? null,
+          pill_statuses: (r.pillStatuses ?? []) as any,
+          sort_order: r.sortOrder ?? idx,
+        }))
+      );
+    } catch (e: any) {
+      setServicesError(e?.message ?? 'Failed to load services.');
       setServices([]);
-      return;
+      setServicesSha('');
     }
-
-    setServices(data as unknown as ServiceRow[]);
   };
 
   const toggleServicePill = (id: string, pill: ServicePillStatus) => {
@@ -196,7 +232,6 @@ export default function AdminPage() {
 
   const deleteService = (id: string) => {
     setServices((prev) => prev.filter((s) => s.id !== id));
-    setDeletedServiceIds((prev) => new Set(prev).add(id));
   };
 
   const uploadServiceImage = async (file: File, type: 'icon' | 'modal'): Promise<string | null> => {
@@ -266,55 +301,44 @@ export default function AdminPage() {
   const saveServices = async () => {
     setServicesError('');
 
-    if (status === 'loading') return;
-
-    const nextSession = update ? await update() : session;
-    const accessToken = (nextSession as any)?.supabaseAccessToken as string | undefined;
-    if (!accessToken) {
-      setServicesError('Not authenticated. Please log in again.');
-      return;
-    }
-
     setSavingServices(true);
     try {
-      const supabaseUser = createSupabaseUserClient(accessToken);
-
-      // Delete removed services from Supabase
-      if (deletedServiceIds.size > 0) {
-        const { error: deleteError } = await supabaseUser
-          .from('services')
-          .delete()
-          .in('id', Array.from(deletedServiceIds));
-
-        if (deleteError) {
-          setServicesError(`Failed to delete services: ${deleteError.message}`);
-          return;
-        }
-        setDeletedServiceIds(new Set());
-      }
-
-      // Upsert current services
-      const payload = services.map((s) => ({
-        id: s.id,
-        title: s.title,
-        description: s.description,
-        details: s.details ?? null,
-        icon_src: s.icon_src ?? null,
-        modal_image_src: s.modal_image_src ?? null,
-        pill_statuses: (s.pill_statuses ?? []) as any,
-        sort_order: s.sort_order ?? 0,
-        updated_at: new Date().toISOString(),
-      }));
-
-      const { error: upsertError } = await supabaseUser
-        .from('services')
-        .upsert(payload as any, { onConflict: 'id' });
-
-      if (upsertError) {
-        setServicesError(`Failed to save services: ${upsertError.message}`);
+      if (!servicesSha) {
+        setServicesError('Missing SHA for services.json. Refresh the page and try again.');
         return;
       }
 
+      const payload: StaticServiceRow[] = services
+        .slice()
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map((s, idx) => ({
+          id: s.id,
+          title: s.title,
+          description: s.description,
+          details: s.details ?? null,
+          iconSrc: s.icon_src ?? null,
+          modalImageSrc: s.modal_image_src ?? null,
+          pillStatuses: (s.pill_statuses ?? []) as any,
+          sortOrder: idx,
+        }));
+
+      const res = await fetch('/api/admin/services', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          services: payload,
+          sha: servicesSha,
+          message: 'Update services.json via admin',
+        }),
+      });
+
+      const json = (await res.json()) as { ok?: boolean; sha?: string; error?: string };
+      if (!res.ok || !json.ok) {
+        setServicesError(json.error || 'Failed to save services.');
+        return;
+      }
+
+      setServicesSha(json.sha ?? servicesSha);
       await fetchServices();
     } finally {
       setSavingServices(false);
@@ -850,6 +874,68 @@ export default function AdminPage() {
                   />
                 </label>
               </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {(() => {
+                  const pills = new Set<ServicePillStatus>((newService.pill_statuses ?? []) as ServicePillStatus[]);
+                  return (
+                    <>
+                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={pills.has('available')}
+                          onChange={() =>
+                            setNewService((p) => ({
+                              ...p,
+                              pill_statuses: togglePillInSet((p.pill_statuses ?? []) as any, 'available'),
+                            }))
+                          }
+                        />
+                        Available
+                      </label>
+                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={pills.has('unavailable')}
+                          onChange={() =>
+                            setNewService((p) => ({
+                              ...p,
+                              pill_statuses: togglePillInSet((p.pill_statuses ?? []) as any, 'unavailable'),
+                            }))
+                          }
+                        />
+                        Unavailable
+                      </label>
+                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={pills.has('remote')}
+                          onChange={() =>
+                            setNewService((p) => ({
+                              ...p,
+                              pill_statuses: togglePillInSet((p.pill_statuses ?? []) as any, 'remote'),
+                            }))
+                          }
+                        />
+                        Remote
+                      </label>
+                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={pills.has('on_site')}
+                          onChange={() =>
+                            setNewService((p) => ({
+                              ...p,
+                              pill_statuses: togglePillInSet((p.pill_statuses ?? []) as any, 'on_site'),
+                            }))
+                          }
+                        />
+                        On-site
+                      </label>
+                    </>
+                  );
+                })()}
+              </div>
               <label className="grid gap-1">
                 <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Details</span>
                 <textarea
@@ -1053,7 +1139,7 @@ export default function AdminPage() {
             })}
 
             {services.length === 0 ? (
-              <div className="text-sm font-semibold text-slate-500">No services found in Supabase.</div>
+              <div className="text-sm font-semibold text-slate-500">No services found.</div>
             ) : null}
           </div>
         </div>

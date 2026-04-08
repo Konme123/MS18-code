@@ -1,0 +1,32 @@
+[
+  {
+    "id": "svc-computer-repair",
+    "title": "Computer Repair",
+    "description": "Diagnostics and repair for desktops and laptops.",
+    "details": "Diagnostics and repair for desktops and laptops.",
+    "iconSrc": "/icons/repair.svg",
+    "modalImageSrc": "/about-image.jpg",
+    "pillStatuses": ["available", "on_site"],
+    "sortOrder": 0
+  },
+  {
+    "id": "svc-it-support",
+    "title": "IT Support",
+    "description": "On-site and remote support for common IT issues.",
+    "details": "On-site and remote support for common IT issues.",
+    "iconSrc": "/icons/support.svg",
+    "modalImageSrc": "/about-image.jpg",
+    "pillStatuses": ["available", "remote"],
+    "sortOrder": 1
+  },
+  {
+    "id": "svc-network-setup",
+    "title": "Network Setup",
+    "description": "Router, Wi‑Fi, and small office network setup.",
+    "details": "Router, Wi‑Fi, and small office network setup.",
+    "iconSrc": "/icons/network.svg",
+    "modalImageSrc": "/about-image.jpg",
+    "pillStatuses": ["available", "on_site"],
+    "sortOrder": 2
+  }
+]

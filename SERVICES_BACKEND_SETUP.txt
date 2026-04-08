@@ -1,0 +1,117 @@
+SERVICES BACKEND (SEPARATE REPO) – SETUP CHECKLIST
+
+Goal
+- Frontend repo (D:\code) keeps /admin UI and NextAuth login.
+- Backend repo (D:\code-backend) is a separate repo that talks to GitHub and edits services.json.
+- Frontend calls backend through a server-side proxy route so secrets are never exposed in the browser.
+
+========================================
+PART A — BACKEND REPO (D:\code-backend)
+========================================
+
+1) Put backend folder in its own GitHub repo
+- Folder: D:\code-backend
+- Create a new repo on GitHub (example: ms18-backend)
+- Initialize git in D:\code-backend and push it to that repo.
+
+2) Install dependencies
+- Open a terminal in D:\code-backend and run:
+  npm install
+
+3) Create backend environment file
+- In D:\code-backend create a file named: .env
+- Copy from: .env.example
+
+4) Set these backend env vars in D:\code-backend\.env
+
+PORT=5055
+BACKEND_SHARED_SECRET=MAKE_A_LONG_RANDOM_SECRET
+
+# GitHub Contents API (token must have Contents: Read & Write)
+GITHUB_TOKEN=YOUR_GITHUB_TOKEN
+GITHUB_OWNER=YOUR_GITHUB_OWNER_OR_ORG
+GITHUB_REPO=REPO_THAT_CONTAINS_services.json
+GITHUB_BRANCH=main
+GITHUB_SERVICES_FILE_PATH=src/data/services.json
+
+NOTES
+- GITHUB_REPO can be a “content repo” (recommended) that only stores services.json.
+- BACKEND_SHARED_SECRET MUST match the frontend value exactly.
+
+5) Run the backend
+- In D:\code-backend run:
+  npm run dev
+
+6) Test backend is running
+- Open in browser:
+  http://localhost:5055/health
+- Expected JSON:
+  { "ok": true }
+
+========================================
+PART B — FRONTEND REPO (D:\code)
+========================================
+
+1) Add frontend env vars
+- In D:\code\.env.local add:
+
+BACKEND_BASE_URL=http://localhost:5055
+BACKEND_SHARED_SECRET=THE_SAME_SECRET_AS_BACKEND
+
+2) Remove GitHub token vars from frontend (recommended)
+- In D:\code\.env.local you should NOT need:
+  GITHUB_TOKEN
+  GITHUB_OWNER
+  GITHUB_REPO
+  GITHUB_BRANCH
+  GITHUB_SERVICES_FILE_PATH
+(Those belong in the backend now.)
+
+3) Restart frontend dev server
+- In D:\code run:
+  npm run dev
+
+========================================
+PART C — VERIFY EVERYTHING
+========================================
+
+1) Login to admin
+- Go to:
+  http://localhost:3000/admin/login
+- Login with your admin credentials.
+
+2) Test the frontend proxy API
+- Open:
+  http://localhost:3000/api/admin/services
+
+Expected:
+- It returns JSON like:
+  { services: [...], sha: "..." }
+
+If you get errors:
+- 401 Unauthorized
+  - You are not logged into /admin, OR backend secret mismatch.
+
+- 500 Failed to load services
+  - Backend not running, wrong BACKEND_BASE_URL, or backend env vars missing.
+
+- 404 Not Found from GitHub
+  - Wrong GITHUB_OWNER / GITHUB_REPO / GITHUB_BRANCH / GITHUB_SERVICES_FILE_PATH
+  - Or the file does not exist in that repo/branch.
+
+3) Save from the admin UI
+- Go to:
+  http://localhost:3000/admin
+- Edit services and click “Save services”
+
+Expected:
+- A new commit appears in the GitHub repo that contains services.json.
+
+========================================
+IMPORTANT SECURITY NOTES
+========================================
+
+- NEVER put GITHUB_TOKEN in frontend code or client-side requests.
+- BACKEND_SHARED_SECRET must only exist server-side:
+  - It is safe in .env / .env.local because Next.js API routes run on the server.
+
